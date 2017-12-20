@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="./styles.css">
+</head>
+<body>
+
+<div class="container">  
+  <div id="contact" action="" method="post">
+    <h3>RSA ENCRYPTOR</h3>
+    <h4>This application encrypts/decrypts entered test using RSA encrypting algorithm</h4>
+    <div style="display: flex;">
+    <input class="source-message" id="q" placeholder="Enter q" type="text" >
+    <input class="source-message" id="p" placeholder="Enter p" type="text" >
+    <input class="source-message" id="pk" placeholder="Enter publicKey" type="text">
+    </div>
+    <fieldset>
+      <input id="source-message" placeholder="Enter message to encrypt" type="text" tabindex="1" required autofocus>
+    </fieldset>
+    <fieldset>
+      <input id="encrypted-message" placeholder="Here will be showed encrypted text" type="email" tabindex="2" required>
+    </fieldset>
+    <fieldset>
+      <input id="decrypted-message" placeholder="Here will be showed decrypted text" type="tel" tabindex="3" required>
+    </fieldset>
+
+    	<div class="button-group">
+		  	<button name="submit" type="submit" id="encrypt" data-submit="...Sending">Encrypt</button>
+		   	<button name="submit" type="submit" id="decrypt" data-submit="...Sending">Decrypt
+		   </button>
+       </div>
+    </fieldset>
+  
+  </div>
+</div>
+
+<script type="text/javascript" src="rsa.js"></script>
+</body>
+</html>
