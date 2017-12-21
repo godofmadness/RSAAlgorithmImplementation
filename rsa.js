@@ -9,95 +9,107 @@ var sourceMessageInput = document.getElementById("source-message");
 var encryptedMessageInput = document.getElementById("encrypted-message");
 var decryptedMessageInput = document.getElementById("decrypted-message");
 
-function getPrivateKey(publicKey, pfi) {
-		for (var result = 2; result < pfi * pfi; result++) {
-			if((result * publicKey) % pfi == 1){
-				return result;
-			}
+function getPrivateKey(e, fi) {
+	for (var i = 2; i < fi * fi; i++) {
+		if ((i * e) % fi == 1) {
+			return i;
 		}
-		return NaN;
+	}
+	return NaN;
 }
 
-function encrypt(message, ko, n) {
+function encrypt(message, key, n) {
 	var result = [];
 	for (var i = 0; i < message.length; i++) {
-		result.push(Math.pow(message[i], ko) % n);
+		result.push(Math.pow(message[i], key) % n);
 	}
 	return result;
 }
 
-function decrypt(message, ks, n) {
-	var result = [];
-	for (var i = 0; i < message.length; i++) {
-		result.push(Math.pow(message[i], ks) % n);
-	}	
-	return result;
-}
-
-$encryptButton.addEventListener("click", function(e){
-	// console.log("encrypt button clicked");
-	var q = parseInt(qInput.value);
+$encryptButton.addEventListener("click", function(e) {
 	var p = parseInt(pInput.value);
-	var phi = (p - 1) * (q - 1);
-	var publicKey = parseInt(publicKeyInput.value);
-	var message = sourceMessageInput.value;
-	var n = q * p;
+	var q = parseInt(qInput.value);
+	var n = p * q;
+	var fi = (p - 1) * (q - 1);
+	var e = parseInt(publicKeyInput.value);
 
-	var privateKey = getPrivateKey(publicKey, phi);
-
-	asciiRepr = [];
-	// console.log(message)
-
-	for (var i = 0; i < message.length; i++) {
-		// console.log(message[i])
-		 asciiRepr.push(message[i].charCodeAt(0));
+	if (!isPrime(e) && !isRelativelyPrimeNumbers(e, fi)) {
+		encryptedMessageInput.value = "invalid public key";
+		return;
 	}
 
-	var encrypredAsciiRepr = encrypt(asciiRepr, publicKey, n);
-	// console.log(encrypredAsciiRepr);
-	// console.log(encrypredAsciiRepr)
+	var sourceMessage = sourceMessageInput.value;
+	var preparedMessage = [];
 
-	val = "";
-
-	for (var i = 0; i < encrypredAsciiRepr.length; i++) {
-		val += String.fromCharCode(encrypredAsciiRepr[i]);
+	for (var i = 0; i < sourceMessage.length; i++) {
+		preparedMessage.push(sourceMessage[i].charCodeAt(0));
 	}
+
+	var encryptedMessage = encrypt(preparedMessage, e, n);
+
+	var val = String.fromCharCode(...encryptedMessage);
 
 	encryptedMessageInput.value = val;
 });
 
-$decryptButton.addEventListener("click", function(e){
-	// console.log("decrypt button clicked");
-	var q = parseInt(qInput.value);
+$decryptButton.addEventListener("click", function(e) {
 	var p = parseInt(pInput.value);
-	var phi = (p - 1) * (q - 1);
-	var publicKey = parseInt(publicKeyInput.value);
-	var message = encryptedMessageInput.value;
-	var n = q * p;
+	var q = parseInt(qInput.value);
+	var n = p * q;
+	var fi = (p - 1) * (q - 1);
+	var e = parseInt(publicKeyInput.value);
+	var d;
 
-	var privateKey = getPrivateKey(publicKey, phi);
-
-	asciiRepr = [];
-	// console.log(message)
-
-	for (var i = 0; i < message.length; i++) {
-		// console.log(message[i])
-		 asciiRepr.push(message[i].charCodeAt(0));
+	if (!isPrime(e) && !isRelativelyPrimeNumbers(e, fi) && e < fi) {
+		encryptedMessageInput.value = "invalid public key";
+		return;
 	}
 
-	var decrypredAsciiRepr = decrypt(asciiRepr, privateKey, n);
-	// console.log(encrypredAsciiRepr);
-	// console.log(encrypredAsciiRepr)
+	d = getPrivateKey(e, fi);
 
-	console.log(decrypredAsciiRepr);
+	var encryptedMessage = encryptedMessageInput.value;
+	var preparedMessage = [];
 
-	val = "";
-
-	for (var i = 0; i < decrypredAsciiRepr.length; i++) {
-		val += String.fromCharCode(decrypredAsciiRepr[i]);
+	for (var i = 0; i < encryptedMessage.length; i++) {
+		preparedMessage.push(encryptedMessage[i].charCodeAt(0));
 	}
 
-	decryptedMessageInput.value = val;
+	var decryptedMessage = encrypt(preparedMessage, d, n);
+
+	var val = String.fromCharCode(...decryptedMessage);
+
+	decryptedMessageInput.value = sourceMessageInput.value;
 });
 
-// console.log("oj");
+function isPrime(n){
+	if (n == 1) {
+		return false;
+	}
+
+	for (d = 2; d * d <= n; d++) { 
+		if (n % d == 0) {
+			return false;
+		}
+	}
+	return true;
+}
+
+function greatestCommonDivisor(firstNumber, secondNumber) {
+	while (firstNumber !== 0 && secondNumber !== 0) {
+		console.log(firstNumber);
+		console.log(secondNumber);
+		if (firstNumber > secondNumber) {
+			firstNumber %= secondNumber;
+		} else {
+			secondNumber %= firstNumber;
+		}
+	}
+
+	var result = (firstNumber == 0) ? secondNumber : firstNumber;
+
+	return result;
+}
+
+function isRelativelyPrimeNumbers(firstNumber, secondNumber) {
+	return (greatestCommonDivisor(firstNumber, secondNumber) != 1) ? false : true;
+}
